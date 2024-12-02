@@ -1,0 +1,37 @@
+import json
+from iqoptionapi.stable_api import IQ_Option
+def extract_actives(api_response):
+    """
+    Extrai o nome e o ID dos pares da resposta da API da IQ Option.
+    
+    :param api_response: Resposta JSON da API (string ou dicionário).
+    :return: Dicionário no formato { "nome": id, ... }
+    """
+    api_response = API.get_all_init()
+    if isinstance(api_response, str):
+        api_response = json.loads(api_response)
+    
+    # Verificar se a resposta é válida e contém os dados necessários
+    try:
+        actives = api_response['result']['digital']['actives']
+    except KeyError:
+        raise ValueError("A estrutura da resposta da API não contém 'turbo' -> 'actives'")
+    
+    active_dict = {}
+    
+    for key, value in actives.items():
+        name = value.get('name', '').replace('front.', '').replace('/', '').split(' ')[0]
+        active_dict[name] = value['id']
+        
+    print(json.dumps(actives, indent=2))
+    
+    return active_dict
+
+# Exemplo de uso:
+if __name__ == "__main__":
+    API = IQ_Option("lazaromarconcini@hotmail.com", "melo1991") 
+    API.connect()
+    # Substitua aqui pela resposta real da API
+    api_response = API.get_all_init()
+    actives = extract_actives(api_response)
+    
